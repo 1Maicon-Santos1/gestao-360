@@ -22,7 +22,7 @@ function monthLabel(): string {
 // ─── A) Teste ──────────────────────────────────────────────────────────
 export function buildTestMessage(): string {
   return [
-    '✅ *FinanceHub*',
+    '✅ *Gestão 360*',
     '',
     'Teste de envio realizado com sucesso.',
     `Data: ${format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}`,
@@ -33,7 +33,7 @@ export function buildTestMessage(): string {
 // ─── B) Saldo de hoje ─────────────────────────────────────────────────
 export function buildBalanceMessage(data: DashboardData): string {
   const lines = [
-    `💰 *FinanceHub | Saldo de hoje*`,
+    `💰 *Gestão 360 | Saldo de hoje*`,
     '',
     `Saldo total: ${formatCurrency(data.totalBalance)}`,
   ]
@@ -51,7 +51,7 @@ export function buildPJCashMessage(data: DashboardData, pjAccountName: string): 
   const label = pjAccount ? pjAccount.name : `Total empresa (conta PJ não encontrada: "${pjAccountName}")`
 
   return [
-    `💼 *FinanceHub | Caixa PJ*`,
+    `💼 *Gestão 360 | Caixa PJ*`,
     '',
     `Conta: ${label}`,
     `Valor disponível: *${formatCurrency(balance)}*`,
@@ -64,7 +64,7 @@ export function buildPJCashMessage(data: DashboardData, pjAccountName: string): 
 export function buildCashFlowMessage(data: DashboardData): string {
   const result = data.monthProfit >= 0 ? '✅' : '⚠️'
   return [
-    `📈 *FinanceHub | Fluxo de caixa*`,
+    `📈 *Gestão 360 | Fluxo de caixa*`,
     '',
     `Período: ${monthLabel()}`,
     `Entradas: ${formatCurrency(data.monthIncome)}`,
@@ -87,7 +87,7 @@ export function buildActiveClientsMessage(clients: Client[]): string {
   const extra = active.length > 10 ? `\n...e mais ${active.length - 10} cliente${active.length - 10 !== 1 ? 's' : ''}` : ''
 
   return [
-    `👥 *FinanceHub | Clientes ativos*`,
+    `👥 *Gestão 360 | Clientes ativos*`,
     '',
     `Total: *${active.length}* cliente${active.length !== 1 ? 's' : ''}`,
     '',
@@ -103,7 +103,7 @@ export function buildUpcomingDuesMessage(data: DashboardData): string {
 
   if (receivables.length === 0) {
     return [
-      `📅 *FinanceHub | Próximos vencimentos*`,
+      `📅 *Gestão 360 | Próximos vencimentos*`,
       '',
       'Nenhum recebimento pendente nos próximos dias.',
       '',
@@ -119,7 +119,7 @@ export function buildUpcomingDuesMessage(data: DashboardData): string {
   }).join('\n')
 
   return [
-    `📅 *FinanceHub | Próximos vencimentos*`,
+    `📅 *Gestão 360 | Próximos vencimentos*`,
     '',
     list,
     '',
@@ -148,7 +148,7 @@ export function buildFullSummaryMessage(
   const resultIcon = data.monthProfit >= 0 ? '✅' : '⚠️'
 
   return [
-    `📌 *FinanceHub | Resumo geral*`,
+    `📌 *Gestão 360 | Resumo geral*`,
     '',
     `💰 Saldo total: *${formatCurrency(data.totalBalance)}*`,
     `💼 Caixa PJ: *${formatCurrency(pjBalance)}*`,

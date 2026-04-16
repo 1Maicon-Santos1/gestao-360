@@ -66,7 +66,7 @@ function buildDaily(accounts: any[], transactions: any[], upcoming: any[], clien
   const pjBal   = pjAcc ? pjAcc.current_balance : business
   const weekday = format(new Date(), "EEEE, dd 'de' MMMM", { locale: ptBR })
 
-  const L: string[] = [`📊 *FinanceHub | Resumo Diário*`, `_${weekday}_`, '']
+  const L: string[] = [`📊 *Gestão 360 | Resumo Diário*`, `_${weekday}_`, '']
 
   if (cfg.include_balance !== false) {
     L.push(`💰 *Saldo total:* ${formatCurrency(total)}`)
@@ -115,7 +115,7 @@ function buildWeekly(accounts: any[], transactions: any[], upcoming: any[], clie
   const upRecv  = upcoming.filter((t: any) => t.transaction_type === 'income'  && t.due_date >= today)
   const upPay   = upcoming.filter((t: any) => t.transaction_type === 'expense' && t.due_date >= today)
 
-  const L: string[] = [`📊 *FinanceHub | Resumo Semanal*`, `_${monthLabel()}_`, '']
+  const L: string[] = [`📊 *Gestão 360 | Resumo Semanal*`, `_${monthLabel()}_`, '']
   if (cfg.include_result !== false) {
     L.push(`📈 *Resultado do mês*`)
     L.push(`  Entradas: ${formatCurrency(income)}`)
@@ -166,9 +166,9 @@ function buildAlerts(upcoming: any[], cfg: Record<string, any>): string | null {
   const hasAny  = ovPay.length + ovRecv.length + fuPay.length + fuRecv.length > 0
 
   if (!hasAny && cfg.only_if_items !== false) return null
-  if (!hasAny) return [`📅 *FinanceHub | Alertas de Vencimento*`, '', '✅ Nenhum vencimento próximo.', '', `_Verificado em ${stamp()}_`].join('\n')
+  if (!hasAny) return [`📅 *Gestão 360 | Alertas de Vencimento*`, '', '✅ Nenhum vencimento próximo.', '', `_Verificado em ${stamp()}_`].join('\n')
 
-  const L: string[] = [`📅 *FinanceHub | Alertas de Vencimento*`, '']
+  const L: string[] = [`📅 *Gestão 360 | Alertas de Vencimento*`, '']
   if (cfg.include_upcoming_in_alert !== false && (fuPay.length + fuRecv.length) > 0) {
     L.push(`⏰ *Próximos (${cfg.days_before || 3} dias)*`)
     ;[...fuPay, ...fuRecv].sort((a: any, b: any) => (a.due_date || '').localeCompare(b.due_date || '')).slice(0, max).forEach((t: any) => {

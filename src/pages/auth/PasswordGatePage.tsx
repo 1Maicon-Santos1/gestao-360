@@ -41,7 +41,7 @@ export default function PasswordGatePage() {
             <Lock className="h-8 w-8 text-primary" />
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold tracking-tight">FinanceHub</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Gestão 360</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Digite a senha para acessar
             </p>

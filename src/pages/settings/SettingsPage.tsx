@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { User, Building2, Palette, Bell, Download, Moon, Sun, Smartphone } from 'lucide-react'
+import { User, Building2, Palette, Bell, Download, Moon, Sun, Smartphone, Camera } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,11 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { supabase } from '@/lib/supabase'
 import { FIXED_USER_ID } from '@/lib/constants'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
+
+export const PROFILE_PHOTO_KEY = 'fh_profile_photo'
 
 const profileSchema = z.object({
   full_name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -32,12 +34,31 @@ export default function SettingsPage() {
   const { canInstall, isInstalled, install } = usePWAInstall()
   const [darkMode, setDarkMode] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(
+    () => localStorage.getItem(PROFILE_PHOTO_KEY)
+  )
+  const photoInputRef = useRef<HTMLInputElement>(null)
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) { toast.error('Imagem muito grande. Máximo 2 MB.'); return }
+    const reader = new FileReader()
+    reader.onload = () => {
+      const base64 = reader.result as string
+      localStorage.setItem(PROFILE_PHOTO_KEY, base64)
+      setProfilePhoto(base64)
+      toast.success('Foto de perfil atualizada!')
+      window.dispatchEvent(new Event('profile-photo-changed'))
+    }
+    reader.readAsDataURL(file)
+  }
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm<ProfileData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       full_name: '',
-      system_name: 'FinanceHub',
+      system_name: 'Gestão 360',
       default_currency: 'BRL',
       timezone: 'America/Sao_Paulo',
       date_format: 'DD/MM/YYYY',
@@ -54,7 +75,7 @@ export default function SettingsPage() {
         if (data) {
           reset({
             full_name: data.full_name ?? '',
-            system_name: data.system_name ?? 'FinanceHub',
+            system_name: data.system_name ?? 'Gestão 360',
             default_currency: data.default_currency ?? 'BRL',
             timezone: data.timezone ?? 'America/Sao_Paulo',
             date_format: data.date_format ?? 'DD/MM/YYYY',
@@ -80,7 +101,7 @@ export default function SettingsPage() {
     }
   }
 
-  const initials = (watch('full_name') || 'FinanceHub')
+  const initials = (watch('full_name') || 'Gestão 360')
     .split(' ')
     .map((w: string) => w[0])
     .join('')
@@ -103,21 +124,58 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Informações do perfil</CardTitle>
-              <CardDescription>Dados da sua conta no FinanceHub</CardDescription>
+              <CardDescription>Dados da sua conta no Gestão 360</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit(onSaveProfile)} className="space-y-5">
                 {/* Avatar */}
                 <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarFallback className="bg-primary text-primary-foreground text-xl">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="relative group">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={profilePhoto ?? undefined} alt="Foto de perfil" />
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <button
+                      type="button"
+                      onClick={() => photoInputRef.current?.click()}
+                      className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Camera className="h-5 w-5 text-white" />
+                    </button>
+                  </div>
                   <div>
                     <p className="text-sm font-medium">Foto de perfil</p>
-                    <p className="text-xs text-muted-foreground">FinanceHub</p>
+                    <button
+                      type="button"
+                      onClick={() => photoInputRef.current?.click()}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      {profilePhoto ? 'Alterar foto' : 'Adicionar foto'}
+                    </button>
+                    {profilePhoto && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          localStorage.removeItem(PROFILE_PHOTO_KEY)
+                          setProfilePhoto(null)
+                          window.dispatchEvent(new Event('profile-photo-changed'))
+                          toast.success('Foto removida.')
+                        }}
+                        className="ml-3 text-xs text-destructive hover:underline"
+                      >
+                        Remover
+                      </button>
+                    )}
                   </div>
+                  <input
+                    ref={photoInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePhotoChange}
+                  />
                 </div>
 
                 <Separator />
@@ -130,7 +188,7 @@ export default function SettingsPage() {
                   </div>
                   <div className="space-y-1.5">
                     <Label>Nome do sistema</Label>
-                    <Input placeholder="FinanceHub" {...register('system_name')} />
+                    <Input placeholder="Gestão 360" {...register('system_name')} />
                   </div>
                 </div>
 
@@ -186,7 +244,7 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Aparência</CardTitle>
-              <CardDescription>Personalize a interface do FinanceHub</CardDescription>
+              <CardDescription>Personalize a interface do Gestão 360</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between rounded-xl border p-4">
@@ -220,7 +278,7 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Instalar como App</CardTitle>
-              <CardDescription>Use o FinanceHub como um aplicativo nativo no seu dispositivo</CardDescription>
+              <CardDescription>Use o Gestão 360 como um aplicativo nativo no seu dispositivo</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
               {isInstalled ? (
@@ -230,7 +288,7 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-green-800">App instalado!</p>
-                    <p className="text-xs text-green-700">O FinanceHub está instalado no seu dispositivo.</p>
+                    <p className="text-xs text-green-700">O Gestão 360 está instalado no seu dispositivo.</p>
                   </div>
                 </div>
               ) : canInstall ? (
@@ -240,7 +298,7 @@ export default function SettingsPage() {
                       <Download className="h-5 w-5 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold">FinanceHub disponível para instalação</p>
+                      <p className="text-sm font-semibold">Gestão 360 disponível para instalação</p>
                       <p className="text-xs text-muted-foreground">Instale e use como app nativo no Android</p>
                     </div>
                   </div>
@@ -254,7 +312,7 @@ export default function SettingsPage() {
                   <div className="rounded-xl border p-4 space-y-3">
                     <p className="text-sm font-medium">Como instalar no iPhone (iOS)</p>
                     <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
-                      <li>Abra o FinanceHub no Safari</li>
+                      <li>Abra o Gestão 360 no Safari</li>
                       <li>Toque no botão de compartilhamento (caixa com seta para cima)</li>
                       <li>Role para baixo e toque em <strong>Adicionar à Tela de Início</strong></li>
                       <li>Toque em <strong>Adicionar</strong> para confirmar</li>
@@ -263,7 +321,7 @@ export default function SettingsPage() {
                   <div className="rounded-xl border p-4 space-y-3">
                     <p className="text-sm font-medium">Como instalar no Android</p>
                     <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
-                      <li>Abra o FinanceHub no Chrome</li>
+                      <li>Abra o Gestão 360 no Chrome</li>
                       <li>Toque no menu (⋮) no canto superior direito</li>
                       <li>Toque em <strong>Adicionar à tela inicial</strong></li>
                       <li>Confirme a instalação</li>

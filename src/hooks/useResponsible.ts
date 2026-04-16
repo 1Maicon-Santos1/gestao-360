@@ -33,10 +33,13 @@ export function useCreateResponsible() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async (data: Omit<Responsible, 'id' | 'user_id' | 'created_at'>) => {
-      const { error } = await supabase
+      const { data: created, error } = await supabase
         .from('people_responsible')
         .insert({ ...data, user_id: FIXED_USER_ID })
+        .select('id')
+        .single()
       if (error) throw error
+      return created as { id: string }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['responsible'] })

@@ -18,8 +18,9 @@ import {
   ChevronDown,
   DollarSign,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { PROFILE_PHOTO_KEY } from '@/pages/settings/SettingsPage'
 
 const navItems = [
   {
@@ -129,17 +130,28 @@ interface SidebarProps {
 
 export default function Sidebar({ onClose }: SidebarProps) {
   const [managementOpen, setManagementOpen] = useState(true)
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(
+    () => localStorage.getItem(PROFILE_PHOTO_KEY)
+  )
+
+  useEffect(() => {
+    const handler = () => setProfilePhoto(localStorage.getItem(PROFILE_PHOTO_KEY))
+    window.addEventListener('profile-photo-changed', handler)
+    return () => window.removeEventListener('profile-photo-changed', handler)
+  }, [])
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       {/* Logo */}
       <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
-          <DollarSign className="h-5 w-5 text-white" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary overflow-hidden">
+          {profilePhoto
+            ? <img src={profilePhoto} alt="Logo" className="h-8 w-8 object-cover" />
+            : <DollarSign className="h-5 w-5 text-white" />}
         </div>
         <div>
-          <p className="text-sm font-bold text-sidebar-foreground">FinanceHub</p>
-          <p className="text-xs text-sidebar-foreground/50">Gestão Financeira</p>
+          <p className="text-sm font-bold text-sidebar-foreground">Gestão 360</p>
+          <p className="text-xs text-sidebar-foreground/50">Financeiro</p>
         </div>
       </div>
 
@@ -189,7 +201,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
 
       {/* Footer */}
       <div className="border-t border-sidebar-border p-4">
-        <p className="text-center text-xs text-sidebar-foreground/30">FinanceHub v1.0</p>
+        <p className="text-center text-xs text-sidebar-foreground/30">Gestão 360 v1.0</p>
       </div>
     </div>
   )

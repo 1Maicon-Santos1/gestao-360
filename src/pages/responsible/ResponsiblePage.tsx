@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { Plus, Edit, Trash2, MoreHorizontal, UserCheck, Power } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Plus, Edit, Trash2, MoreHorizontal, UserCheck, Power, Camera } from 'lucide-react'
+import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -40,14 +41,30 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>
 
+const RESPONSIBLE_PHOTO_PREFIX = 'fh_resp_photo_'
+
 function getInitials(name: string) {
   return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
+}
+
+function getResponsiblePhoto(id: string): string | null {
+  return localStorage.getItem(RESPONSIBLE_PHOTO_PREFIX + id)
+}
+
+function saveResponsiblePhoto(id: string, base64: string): void {
+  localStorage.setItem(RESPONSIBLE_PHOTO_PREFIX + id, base64)
+}
+
+function removeResponsiblePhoto(id: string): void {
+  localStorage.removeItem(RESPONSIBLE_PHOTO_PREFIX + id)
 }
 
 export default function ResponsiblePage() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Responsible | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [pendingPhoto, setPendingPhoto] = useState<string | null>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
 
   const { data: responsible = [], isLoading } = useResponsible()
   const create = useCreateResponsible()
@@ -62,18 +79,35 @@ export default function ResponsiblePage() {
   const openCreate = () => {
     reset({ person_type: 'partner', color: '#f59e0b', is_active: true })
     setEditing(null)
+    setPendingPhoto(null)
     setDialogOpen(true)
   }
 
   const openEdit = (r: Responsible) => {
     setEditing(r)
     reset({ name: r.name, person_type: r.person_type, color: r.color, is_active: r.is_active })
+    setPendingPhoto(getResponsiblePhoto(r.id))
     setDialogOpen(true)
   }
 
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) { toast.error('Imagem muito grande. Máximo 2 MB.'); return }
+    const reader = new FileReader()
+    reader.onload = () => setPendingPhoto(reader.result as string)
+    reader.readAsDataURL(file)
+  }
+
   const onSubmit = async (data: FormData) => {
-    if (editing) await update.mutateAsync({ id: editing.id, ...data })
-    else await create.mutateAsync({ ...data, avatar_url: null })
+    if (editing) {
+      await update.mutateAsync({ id: editing.id, ...data })
+      if (pendingPhoto) saveResponsiblePhoto(editing.id, pendingPhoto)
+      else if (pendingPhoto === null && getResponsiblePhoto(editing.id)) removeResponsiblePhoto(editing.id)
+    } else {
+      const created = await create.mutateAsync({ ...data, avatar_url: null })
+      if (pendingPhoto && created?.id) saveResponsiblePhoto(created.id, pendingPhoto)
+    }
     setDialogOpen(false)
   }
 
@@ -102,15 +136,19 @@ export default function ResponsiblePage() {
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {responsible.map((r) => (
+          {responsible.map((r) => {
+            const photo = getResponsiblePhoto(r.id)
+            return (
             <Card key={r.id} className={cn('hover:shadow-md transition-all', !r.is_active && 'opacity-60')}>
               <CardContent className="pt-5 pb-4">
                 <div className="flex items-start justify-between">
                   <div
-                    className="flex h-12 w-12 items-center justify-center rounded-2xl text-white text-sm font-bold"
-                    style={{ backgroundColor: r.color }}
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl text-white text-sm font-bold overflow-hidden"
+                    style={{ backgroundColor: photo ? 'transparent' : r.color }}
                   >
-                    {getInitials(r.name)}
+                    {photo
+                      ? <img src={photo} alt={r.name} className="h-12 w-12 object-cover rounded-2xl" />
+                      : getInitials(r.name)}
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -137,7 +175,8 @@ export default function ResponsiblePage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+          )})}
+
         </div>
       )}
 
@@ -145,6 +184,37 @@ export default function ResponsiblePage() {
         <DialogContent aria-describedby={undefined} className="max-w-md">
           <DialogHeader><DialogTitle>{editing ? 'Editar Responsável' : 'Novo Responsável'}</DialogTitle></DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+            {/* Photo upload */}
+            <div className="flex items-center gap-4">
+              <div className="relative group">
+                <div
+                  className="flex h-16 w-16 items-center justify-center rounded-2xl text-white text-lg font-bold overflow-hidden cursor-pointer"
+                  style={{ backgroundColor: pendingPhoto ? 'transparent' : (watch('color') || '#f59e0b') }}
+                  onClick={() => photoInputRef.current?.click()}
+                >
+                  {pendingPhoto
+                    ? <img src={pendingPhoto} alt="preview" className="h-16 w-16 object-cover rounded-2xl" />
+                    : getInitials(watch('name') || '?')}
+                  <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Camera className="h-5 w-5 text-white" />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium">Foto do responsável</p>
+                <button type="button" onClick={() => photoInputRef.current?.click()} className="text-xs text-primary hover:underline">
+                  {pendingPhoto ? 'Alterar foto' : 'Adicionar foto'}
+                </button>
+                {pendingPhoto && (
+                  <button type="button" onClick={() => setPendingPhoto(null)} className="ml-3 text-xs text-destructive hover:underline">
+                    Remover
+                  </button>
+                )}
+              </div>
+              <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoSelect} />
+            </div>
+
             <div className="space-y-1.5">
               <Label>Nome *</Label>
               <Input placeholder="Nome completo" {...register('name')} />

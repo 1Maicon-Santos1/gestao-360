@@ -1,7 +1,7 @@
 {
-  "name": "FinanceHub — Gestão Financeira",
-  "short_name": "FinanceHub",
-  "description": "Gestão financeira pessoal e empresarial em um só lugar",
+  "name": "Gestão 360",
+  "short_name": "Gestão 360",
+  "description": "Gestão 360 — Controle financeiro pessoal e empresarial",
   "start_url": "/dashboard",
   "display": "standalone",
   "orientation": "any",

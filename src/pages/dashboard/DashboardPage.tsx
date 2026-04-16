@@ -175,7 +175,7 @@ export default function DashboardPage() {
               <DollarSign className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-medium">Instale o FinanceHub</p>
+              <p className="text-sm font-medium">Instale o Gestão 360</p>
               <p className="text-xs text-muted-foreground">Acesse como app no seu dispositivo</p>
             </div>
           </div>

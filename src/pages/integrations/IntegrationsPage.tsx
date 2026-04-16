@@ -619,7 +619,7 @@ export default function IntegrationsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Integrações" description="Conecte o FinanceHub com ferramentas externas" />
+      <PageHeader title="Integrações" description="Conecte o Gestão 360 com ferramentas externas" />
 
       <Tabs defaultValue="send">
         <TabsList className="flex-wrap h-auto gap-1">
