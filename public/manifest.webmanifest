@@ -1,7 +1,7 @@
 {
   "name": "Gestão 360",
   "short_name": "Gestão 360",
-  "description": "Gestão 360 — Controle financeiro pessoal e empresarial",
+  "description": "Gestão 360 — Controle inteligente pessoal e empresarial",
   "start_url": "/dashboard",
   "display": "standalone",
   "orientation": "any",
@@ -22,13 +22,13 @@
     {
       "name": "Novo Lançamento",
       "short_name": "Lançamento",
-      "description": "Criar um novo lançamento financeiro",
+      "description": "Criar um novo lançamento",
       "url": "/lancamentos"
     },
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "Ver o painel financeiro",
+      "description": "Ver o painel de gestão",
       "url": "/dashboard"
     }
   ],

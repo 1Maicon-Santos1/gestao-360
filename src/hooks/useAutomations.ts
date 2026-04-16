@@ -59,7 +59,7 @@ export const AUTOMATION_META: Record<AutomationType, {
   label: string; description: string; emoji: string
   frequency: FrequencyType; time: string; dayOfWeek?: number
 }> = {
-  daily_summary:  { label: 'Resumo diário',         description: 'Resumo financeiro enviado automaticamente ao grupo',    emoji: '📊', frequency: 'daily',  time: '20:00' },
+  daily_summary:  { label: 'Resumo diário',         description: 'Resumo diário enviado automaticamente ao grupo',    emoji: '📊', frequency: 'daily',  time: '20:00' },
   weekly_summary: { label: 'Resumo semanal',         description: 'Visão gerencial toda segunda-feira',                   emoji: '📅', frequency: 'weekly', time: '08:00', dayOfWeek: 1 },
   due_alerts:     { label: 'Alertas de vencimento',  description: 'Notifica contas prestes a vencer ou em atraso',        emoji: '⏰', frequency: 'daily',  time: '09:00' },
   command_parser: { label: 'Parser de comandos',     description: 'Recebe mensagens do grupo e registra transações',      emoji: '🤖', frequency: 'manual', time: '00:00' },

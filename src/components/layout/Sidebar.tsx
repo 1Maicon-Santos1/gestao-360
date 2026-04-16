@@ -151,7 +151,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
         </div>
         <div>
           <p className="text-sm font-bold text-sidebar-foreground">Gestão 360</p>
-          <p className="text-xs text-sidebar-foreground/50">Financeiro</p>
+          <p className="text-xs text-sidebar-foreground/50">Gestão inteligente</p>
         </div>
       </div>
 

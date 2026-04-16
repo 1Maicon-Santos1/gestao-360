@@ -207,7 +207,7 @@ export default function TransactionsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Lançamentos"
-        description="Controle de todas as movimentações financeiras"
+        description="Controle de todas as movimentações"
         action={
           <Button onClick={openCreate} className="gap-2">
             <Plus className="h-4 w-4" />

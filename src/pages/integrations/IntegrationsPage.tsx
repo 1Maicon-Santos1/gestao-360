@@ -236,7 +236,7 @@ function WhatsAppTab() {
         </div>
         <div className="space-y-1.5">
           <Label>Nome do grupo</Label>
-          <Input placeholder="Ex: FINANCEIRO 📊" {...register('group_name')} />
+          <Input placeholder="Ex: GESTÃO 360 📊" {...register('group_name')} />
           <p className="text-xs text-muted-foreground">Apenas descritivo — exibido no histórico e no dashboard</p>
         </div>
       </div>
@@ -646,7 +646,7 @@ export default function IntegrationsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Central de Envios</CardTitle>
-              <CardDescription>Envie resumos financeiros para o grupo WhatsApp com 1 clique</CardDescription>
+              <CardDescription>Envie resumos para o grupo WhatsApp com 1 clique</CardDescription>
             </CardHeader>
             <CardContent><GroupSendTab /></CardContent>
           </Card>
