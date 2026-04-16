@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(cat .env)",
+      "Bash(cat .env.local)",
+      "Bash(node -e ' *)",
+      "Bash(curl -s http://localhost:5176)",
+      "WebSearch",
+      "WebFetch(domain:docs.uazapi.com)",
+      "WebFetch(domain:www.postman.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:documenter.getpostman.com)",
+      "WebFetch(domain:ipazua.uazapi.com)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ]
+  }
+}

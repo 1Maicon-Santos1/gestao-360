@@ -1,0 +1,37 @@
+{
+  "name": "FinanceHub — Gestão Financeira",
+  "short_name": "FinanceHub",
+  "description": "Gestão financeira pessoal e empresarial em um só lugar",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "lang": "pt-BR",
+  "scope": "/",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Novo Lançamento",
+      "short_name": "Lançamento",
+      "description": "Criar um novo lançamento financeiro",
+      "url": "/lancamentos"
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Ver o painel financeiro",
+      "url": "/dashboard"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
